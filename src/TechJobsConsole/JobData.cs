@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
 using System.Text;
@@ -8,6 +9,7 @@ namespace TechJobsConsole
     class JobData
     {
         static List<Dictionary<string, string>> AllJobs = new List<Dictionary<string, string>>();
+        StringComparer curCulIgCase = StringComparer.CurrentCultureIgnoreCase;
         static bool IsDataLoaded = false;
 
         public static List<Dictionary<string, string>> FindAll()
@@ -38,6 +40,7 @@ namespace TechJobsConsole
             return values;
         }
 
+        /*Enable user search by column header(key), then search within values, case insensitive*/
         public static List<Dictionary<string, string>> FindByColumnAndValue(string column, string value)
         {
             // load data, if not already loaded
@@ -49,13 +52,35 @@ namespace TechJobsConsole
             {
                 string aValue = row[column];
 
-                if (aValue.Contains(value))
+                if (aValue.ToUpper().Contains(value))
                 {
                     jobs.Add(row);
                 }
             }
 
             return jobs;
+        }
+
+        /*Enable user Search by any value in the table, without duplicates*/
+        public static List<Dictionary<string, string>> FindbyValue(string searchTerm)
+        {
+            LoadData();
+
+            List<Dictionary<string, string>> jobs = new List<Dictionary<string, string>>();
+
+            foreach (Dictionary<string, string> row in AllJobs)
+                foreach (KeyValuePair<string, string> kvp in row)
+                {
+                    string aValue = kvp.Value.ToUpper();
+
+                    if (aValue.Contains(searchTerm))
+                    {
+                        jobs.Add(row);
+                        break;
+                    }
+                }
+            return jobs;
+
         }
 
         /*
@@ -90,7 +115,7 @@ namespace TechJobsConsole
             // Parse each row array into a more friendly Dictionary
             foreach (string[] row in rows)
             {
-                Dictionary<string, string> rowDict = new Dictionary<string, string>();
+                Dictionary<string, string> rowDict = new Dictionary<string, string>((StringComparer.OrdinalIgnoreCase));
 
                 for (int i = 0; i < headers.Length; i++)
                 {
