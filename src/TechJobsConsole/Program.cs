@@ -135,7 +135,7 @@ namespace TechJobsConsole
                         Console.WriteLine("{0}: {1}", kvp.Key, kvp.Value);
                     }
 
-                    Console.WriteLine("\n   ***   \n");
+                    Console.WriteLine("\n   *****   \n");
                 }
             }
 
